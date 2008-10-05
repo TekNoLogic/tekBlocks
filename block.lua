@@ -1,6 +1,6 @@
 
 local MINOR = 1
-local lib = LibStub:NewLibrary("tekBlock", MINOR)
+local lib = LibStub:NewLibrary("tekBlock2", MINOR)
 if not lib then return end
 
 
@@ -9,11 +9,14 @@ function lib:new(dataobjname, db)
 	-- Delayed init, don't init until first call, and only upgrade that which needs it if previously init'd
 	if self.init < 1 then
 		self.backdrop = {
-			bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
-			edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
-			edgeSize = 16,
-			insets = {left = 5, right = 5, top = 5, bottom = 5},
-			tile = true, tileSize = 16,
+--~ 			bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
+--~ 			edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+--~ 			edgeSize = 16,
+--~ 			insets = {left = 5, right = 5, top = 5, bottom = 5},
+--~ 			tile = true, tileSize = 16,
+			bgFile = "Interface\\AddOns\\tekBlocks\\solid", tile = true, tileSize = 16,
+			edgeFile = "Interface\\AddOns\\tekBlocks\\tekstures", edgeSize = 8,
+			insets = {left = 8, right = 8, top = 8, bottom = 8},
 		}
 
 

@@ -1,14 +1,13 @@
 ## Interface: 20400
 
-## Title: FPSBlock
-## Notes: Minimalistic FPS display
+## Title: tekBlocks
+## Notes: LDB-based data display
 ## Author: Tekkub Stoutwrithe
 ## Version: Alpha
 ## X-Website: http://www.tekkub.net/
 ## X-Email: tekkub-wow@googlegroups.com
-## X-Credits: kergoth's PerfBlock
 
-## SavedVariables: FPSBlockDB
+## SavedVariables: tekBlocksDB
 
 ## LoadManagers: AddonLoader
 ## X-LoadOn-Always: delayed
@@ -16,6 +15,6 @@
 LibStub.lua
 CallbackHandler-1.0.lua
 LibDataBroker-1.1\LibDataBroker-1.1.lua
-tekBlock\tekBlock.lua
 
-FPSBlock.lua
+block.lua
+tekBlocks.lua
