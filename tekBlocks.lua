@@ -50,14 +50,36 @@ f:SetBackdrop({
 })
 
 
-local lastframe
+local function AnchorBlock(block, lastframe)
+	block:SetPoint("TOPLEFT", lastframe or UIParent, lastframe and "TOPRIGHT" or "TOPLEFT")
+
+	if not lastframe then f:SetPoint("LEFT", block, -EDGE, 0) end
+	f:SetPoint("RIGHT", block, EDGE, 0)
+
+	return block
+end
+
+
+local blocks, order = {}, {"MakeRocketGoNow", "BlizzClock", "picoFriends", "picoGuild", "picoRep", "picoDPS", "picoEXP", "TomTom_Coords", "TourGuide", "picoFPS"}
+local temp = {}
+local function SetAnchors()
+	for name,block in pairs(blocks) do temp[name] = block end
+
+	local lastframe
+	for _,name in ipairs(order) do
+		local block = temp[name]
+		if block then lastframe, temp[name] = AnchorBlock(block, lastframe), nil end
+	end
+
+	for name,block in pairs(temp) do lastframe = AnchorBlock(block, lastframe) end
+end
+
+
 function f:NewDataobject(event, name, dataobj)
 	if not dataobj.text then return end
 
 	local frame = CreateFrame("Button", nil, UIParent)
 	frame:SetHeight(24)
-
-	frame:SetPoint("TOPLEFT", lastframe or UIParent, lastframe and "TOPRIGHT" or "TOPLEFT")
 
 	frame:SetBackdrop(backdrop)
 	frame:SetBackdropColor(0.09, 0.09, 0.19, 0.5)
@@ -90,10 +112,8 @@ function f:NewDataobject(event, name, dataobj)
 	frame:SetScript("OnClick", dataobj.OnClick)
 	ldb.RegisterCallback(frame, "LibDataBroker_AttributeChanged_"..name.."_OnClick", "SetDObjScript")
 
-	if not lastframe then self:SetPoint("LEFT", frame, -EDGE, 0) end
-	self:SetPoint("RIGHT", frame, EDGE, 0)
-
-	lastframe = frame
+	blocks[name] = frame
+	SetAnchors()
 end
 
 
