@@ -2,7 +2,7 @@
 assert(LibStub, "LibDataBroker-1.1 requires LibStub")
 assert(LibStub:GetLibrary("CallbackHandler-1.0", true), "LibDataBroker-1.1 requires CallbackHandler-1.0")
 
-local lib, oldminor = LibStub:NewLibrary("LibDataBroker-1.1", 3)
+local lib, oldminor = LibStub:NewLibrary("LibDataBroker-1.1", 4)
 if not lib then return end
 oldminor = oldminor or 0
 
@@ -49,6 +49,15 @@ if oldminor < 2 then
 		self.callbacks:Fire("LibDataBroker_DataObjectCreated", name, dataobj)
 		return dataobj
 	end
+end
+
+if oldminor < 4 then
+	LDB_REGISTRY = LDB_REGISTRY or {}
+	for name,dataobj in pairs(LDB_REGISTRY) do
+		lib:NewDataObject(name, dataobj)
+		LDB_REGISTRY[name] = nil
+	end
+	setmetatable(LDB_REGISTRY, {__newindex = function(t,name, dataobj) lib:NewDataObject(name, dataobj) end})
 end
 
 if oldminor < 1 then

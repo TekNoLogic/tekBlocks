@@ -82,12 +82,31 @@ function lib:new(dataobjname, db)
 	frame.TextUpdate = self.TextUpdate
 	ldb.RegisterCallback(frame, "LibDataBroker_AttributeChanged_"..dataobjname.."_text", "TextUpdate")
 
-	frame.SetDObjScript = self.SetDObjScript
-	frame:SetScript("OnEnter", dataobj.OnEnter)
-	ldb.RegisterCallback(frame, "LibDataBroker_AttributeChanged_"..dataobjname.."_OnEnter", "SetDObjScript")
+	local function GetQuadrant(frame)
+		local x,y = frame:GetCenter()
+		if not x or not y then return "BOTTOMLEFT", "BOTTOM", "LEFT" end
+		local hhalf = (x > UIParent:GetWidth()/2) and "RIGHT" or "LEFT"
+		local vhalf = (y > UIParent:GetHeight()/2) and "TOP" or "BOTTOM"
+		return vhalf..hhalf, vhalf, hhalf
+	end
 
-	frame:SetScript("OnLeave", dataobj.OnLeave)
-	ldb.RegisterCallback(frame, "LibDataBroker_AttributeChanged_"..dataobjname.."_OnLeave", "SetDObjScript")
+	frame.SetDObjScript = self.SetDObjScript
+	frame:SetScript("OnEnter", function(self)
+		print("OnEnter", dataobj.OnEnter, dataobj.OnTooltipShow)
+		if dataobj.OnEnter then return dataobj.OnEnter(self) end
+		if dataobj.OnTooltipShow then
+			GameTooltip:SetOwner(self, "ANCHOR_NONE")
+			local quad, vhalf, hhalf = GetQuadrant(self)
+			local anchpoint = (vhalf == "TOP" and "BOTTOM" or "TOP")..hhalf
+			GameTooltip:SetPoint(quad, self, anchpoint)
+
+			dataobj.OnTooltipShow(GameTooltip)
+			return GameTooltip:Show()
+		end
+	end)
+
+	frame:SetScript("OnLeave", function(self) if dataobj.OnLeave then dataobj.OnLeave(self) else GameTooltip:Hide() end end)
+	--ldb.RegisterCallback(frame, "LibDataBroker_AttributeChanged_"..dataobjname.."_OnLeave", "SetDObjScript")
 
 	return frame
 end

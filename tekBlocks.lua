@@ -60,7 +60,7 @@ local function AnchorBlock(block, lastframe)
 end
 
 
-local blocks, order = {}, {"MakeRocketGoNow", "BlizzClock", "picoFriends", "picoGuild", "picoRep", "picoDPS", "picoEXP", "TomTom_Coords", "TourGuide", "picoFPS"}
+local blocks, order = {}, {"MakeRocketGoNow", "BlizzClock", "picoFriends", "picoGuild", "picoRep", "picoDPS", "picoEXP", "TomTom_Coords", "TourGuide", "DropTheCheapestThing", "picoFPS"}
 local temp = {}
 local function SetAnchors()
 	for name,block in pairs(blocks) do temp[name] = block end
@@ -75,8 +75,18 @@ local function SetAnchors()
 end
 
 
+local function GetQuadrant(frame)
+	local x,y = frame:GetCenter()
+	if not x or not y then return "BOTTOMLEFT", "BOTTOM", "LEFT" end
+	local hhalf = (x > UIParent:GetWidth()/2) and "RIGHT" or "LEFT"
+	local vhalf = (y > UIParent:GetHeight()/2) and "TOP" or "BOTTOM"
+	return vhalf..hhalf, vhalf, hhalf
+end
+
+
 function f:NewDataobject(event, name, dataobj)
-	if not dataobj.text then return end
+	if not dataobj.type then return print("Dataobject '"..name.."' has no type set!") end
+	if dataobj.type ~= 'data source' then return end
 
 	local frame = CreateFrame("Button", nil, UIParent)
 	frame:SetHeight(24)
@@ -84,6 +94,8 @@ function f:NewDataobject(event, name, dataobj)
 	frame:SetBackdrop(backdrop)
 	frame:SetBackdropColor(0.09, 0.09, 0.19, 0.5)
 	frame:SetBackdropBorderColor(0.5, 0.5, 0.5, 1)
+
+	frame.dataobj = dataobj
 
 	frame.icon = frame:CreateTexture()
 	frame.icon:SetWidth(16) frame.icon:SetHeight(16)
@@ -102,13 +114,23 @@ function f:NewDataobject(event, name, dataobj)
 
 	frame:RegisterForClicks("anyUp")
 
+	frame.SetDObjScript = self.SetDObjScript
+	frame:SetScript("OnEnter", function(self)
+		if self.dataobj.OnEnter then return self.dataobj.OnEnter(self) end
+		if self.dataobj.OnTooltipShow then
+			GameTooltip:SetOwner(self, "ANCHOR_NONE")
+			local quad, vhalf, hhalf = GetQuadrant(self)
+			local anchpoint = (vhalf == "TOP" and "BOTTOM" or "TOP")..hhalf
+			GameTooltip:SetPoint(quad, self, anchpoint)
+
+			self.dataobj.OnTooltipShow(GameTooltip)
+			return GameTooltip:Show()
+		end
+	end)
+
+	frame:SetScript("OnLeave", function(self) if dataobj.OnLeave then dataobj.OnLeave(self) else GameTooltip:Hide() end end)
+
 	frame.SetDObjScript = SetDObjScript
-	frame:SetScript("OnEnter", dataobj.OnEnter)
-	ldb.RegisterCallback(frame, "LibDataBroker_AttributeChanged_"..name.."_OnEnter", "SetDObjScript")
-
-	frame:SetScript("OnLeave", dataobj.OnLeave)
-	ldb.RegisterCallback(frame, "LibDataBroker_AttributeChanged_"..name.."_OnLeave", "SetDObjScript")
-
 	frame:SetScript("OnClick", dataobj.OnClick)
 	ldb.RegisterCallback(frame, "LibDataBroker_AttributeChanged_"..name.."_OnClick", "SetDObjScript")
 
