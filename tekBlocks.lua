@@ -15,7 +15,7 @@ local backdrop = {
 
 local function TextUpdate(self, event, name, key, value, dataobj)
 	self.text:SetText(value)
-	self:SetWidth(self.text:GetStringWidth() + 8 + (dataobj.icon and 24 or 0))
+	self:SetWidth(self.text:GetStringWidth() + 12 + (dataobj.icon and 24 or 0))
 end
 
 
@@ -23,7 +23,7 @@ local function IconUpdate(self, event, name, key, value)
 	local oldtexture = self.icon:GetTexture()
 	self.icon:SetTexture(value)
 	if value and value:match("Interface\\Icons") then self.icon:SetTexCoord(4/48, 44/48, 4/48, 44/48) else self.icon:SetTexCoord(0, 1, 0, 1) end
-	if not oldtexture then
+	if value and not oldtexture then
 		self:SetWidth(self:GetWidth() + 24)
 		self.text:SetPoint("CENTER", 12, 0)
 	elseif not value then
@@ -100,17 +100,16 @@ function f:NewDataobject(event, name, dataobj)
 	frame.icon = frame:CreateTexture()
 	frame.icon:SetWidth(16) frame.icon:SetHeight(16)
 	frame.icon:SetPoint("LEFT", 8, 0)
-	frame.icon:SetTexture(dataobj.icon)
-	if dataobj.icon and dataobj.icon:match("Interface\\Icons") then frame.icon:SetTexCoord(4/48, 44/48, 4/48, 44/48) end
 	frame.IconUpdate = IconUpdate
 	ldb.RegisterCallback(frame, "LibDataBroker_AttributeChanged_"..name.."_icon", "IconUpdate")
 
 	frame.text = frame:CreateFontString(nil, nil, "GameFontNormalSmall")
 	frame.text:SetPoint("CENTER", dataobj.icon and 12 or 0, 0)
-	frame.text:SetText(dataobj.text)
-	frame:SetWidth(frame.text:GetStringWidth() + 8 + (dataobj.icon and 24 or 0))
 	frame.TextUpdate = TextUpdate
 	ldb.RegisterCallback(frame, "LibDataBroker_AttributeChanged_"..name.."_text", "TextUpdate")
+
+	IconUpdate(frame, nil, nil, "icon", dataobj.icon)
+	TextUpdate(frame, nil, nil, "text", dataobj.text, dataobj)
 
 	frame:RegisterForClicks("anyUp")
 
