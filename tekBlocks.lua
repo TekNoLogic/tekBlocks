@@ -43,6 +43,7 @@ end
 -------------------------------------------
 
 local f = CreateFrame("frame")
+f:SetFrameStrata('BACKGROUND')
 f:SetHeight(24 + EDGE*2 - 5*2)
 f:SetBackdrop({
 	bgFile = "Interface\\AddOns\\tekBlocks\\solid", tile = true, tileSize = 1,
@@ -90,6 +91,8 @@ function f:NewDataobject(event, name, dataobj)
 
 	local frame = CreateFrame("Button", nil, UIParent)
 	frame:SetHeight(24)
+
+	frame:SetFrameStrata('LOW')
 
 	frame:SetBackdrop(backdrop)
 	frame:SetBackdropColor(0.09, 0.09, 0.19, 0.5)
