@@ -141,6 +141,12 @@ function f:NewDataobject(event, name, dataobj)
 end
 
 
-for name,dataobj in ldb:DataObjectIterator() do if dataobj.text then f:NewDataobject(nil, name, dataobj) end end
+for name,dataobj in ldb:DataObjectIterator() do
+	if dataobj.text then
+		local success, err = pcall(f.NewDataobject, f, nil, name, dataobj)
+		if not success then
+			print("Error loading tekblock for dataobject", name)
+		end
+	end
+end
 ldb.RegisterCallback(f, "LibDataBroker_DataObjectCreated", "NewDataobject")
-
