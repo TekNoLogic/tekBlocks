@@ -1,4 +1,7 @@
-﻿
+
+local myname, ns = ...
+
+
 local ldb = LibStub:GetLibrary("LibDataBroker-1.1")
 
 local EDGE = 8
@@ -45,6 +48,7 @@ end
 local f = CreateFrame("frame")
 f:SetFrameStrata('BACKGROUND')
 f:SetHeight(24 + EDGE*2 - 5*2)
+f:SetPoint("TOPLEFT", ns.anchor, -EDGE, 4)
 f:SetBackdrop({
 	bgFile = "Interface\\AddOns\\tekBlocks\\solid", tile = true, tileSize = 1,
 	edgeFile = "Interface\\AddOns\\tekBlocks\\teksture", edgeSize = EDGE, insets = {left = EDGE, right = EDGE, top = EDGE, bottom = EDGE},
@@ -52,9 +56,11 @@ f:SetBackdrop({
 
 
 local function AnchorBlock(block, lastframe)
-	block:SetPoint("TOPLEFT", lastframe or UIParent, lastframe and "TOPRIGHT" or "TOPLEFT")
-
-	if not lastframe then f:SetPoint("LEFT", block, -EDGE, 0) end
+	if lastframe then
+		block:SetPoint("TOPLEFT", lastframe, "TOPRIGHT")
+	else
+		block:SetPoint("TOPLEFT", ns.anchor)
+	end
 	f:SetPoint("RIGHT", block, EDGE, 0)
 
 	return block
